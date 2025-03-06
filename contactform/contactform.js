@@ -6,7 +6,18 @@ jQuery(document).ready(function($) {
     var f = $(this).find('.form-group'),
       ferror = false,
       emailExp = /^[^\s()<>@,;:\/]+@\w[\w\.-]+\.[a-z]{2,}$/i;
-
+    var jsonData = {};
+    var formData = $(this).serializeArray();
+    $.each(formData, function() {
+      if (jsonData[this.name]) {
+        if (!jsonData[this.name].push) {
+          jsonData[this.name] = [jsonData[this.name]];
+        }
+        jsonData[this.name].push(this.value || '');
+      } else {
+        jsonData[this.name] = this.value || '';
+      }
+    });
     f.children('input').each(function() { // run all inputs
 
       var i = $(this); // current input
@@ -92,19 +103,21 @@ jQuery(document).ready(function($) {
     else var str = $(this).serialize();
     $.ajax({
       type: "POST",
-      url: "contactform/contactform.php",
-      data: str,
+      url: "https://api.web3forms.com/submit",
+      contentType: "application/json",
+      // data: str,
+      data: JSON.stringify(jsonData),
       success: function(msg) {
         // alert(msg);
-        if (msg == 'OK') {
+        // if (msg == 'OK') {
           $("#sendmessage").addClass("show");
           $("#errormessage").removeClass("show");
           $('.contactForm').find("input, textarea").val("");
-        } else {
-          $("#sendmessage").removeClass("show");
-          $("#errormessage").addClass("show");
-          $('#errormessage').html(msg);
-        }
+        // } else {
+        //   $("#sendmessage").removeClass("show");
+        //   $("#errormessage").addClass("show");
+        //   $('#errormessage').html(msg);
+        // }
 
       }
     });
